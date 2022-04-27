@@ -1,0 +1,5 @@
+description: AD5941 High Precision, Impedance, and Electrochemical Front End
+
+compatible: "adi,ad5941"
+
+include: spi-device.yaml

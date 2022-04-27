@@ -1,0 +1,5 @@
+description: ADPD4100 Multimodal Sensor Front End
+
+compatible: "adi,adpd4100"
+
+include: spi-device.yaml
