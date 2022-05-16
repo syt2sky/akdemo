@@ -15,5 +15,6 @@
 int AD5941_init(void);
 
 int AD5941_readRegister(uint16_t addr, uint32_t *data, int numHalfword);
+int AD5941_writeRegister(uint16_t addr, uint32_t *data, int numHalfword);
 
 #endif

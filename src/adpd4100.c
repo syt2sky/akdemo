@@ -33,20 +33,21 @@ int ADPD4100_init(void)
   return 0;
 }
 
-/** Read device register. */
+/** Read device register. */  //写寄存器在ADPD4100手册page26
 int ADPD4100_readRegister(uint16_t addr, uint16_t *data)
 {
   int err;
   uint8_t txdata[2] = {0};
   uint8_t rxdata[2] = {0};
 
-  addr = addr << 1;
-  txdata[0] = addr >> 8;
-  txdata[1] = addr & 0xff;
+//具体读写操作看ADPD4100page26
+  addr = addr << 1;     // 地址是15位+一个读写位
+  txdata[0] = addr >> 8;  //寄存器地址的高八位给[0]
+  txdata[1] = addr & 0xff;  //地址低七位+读写位
 
   struct spi_buf txbufs[] = {
     {.buf = txdata, .len = sizeof(txdata)}
-  };
+  };      //txbufs[]是个结构体数组(是数组，由多个结构体构成)
   struct spi_buf_set txbufset = {.buffers = txbufs, .count = ARRAY_SIZE(txbufs)};
   struct spi_buf rxbufs[] = {
     {.buf = NULL, .len = sizeof(txdata)}, 

@@ -1,8 +1,9 @@
-#include <logging/log.h>
-LOG_MODULE_REGISTER(fc01evl_main);
+#include <logging/log.h>                // log可以分文件打印，用LOG_MODULE_REGISTER
+LOG_MODULE_REGISTER(fc01evl_main);      // 注册log位置，分好几个层级，如info,err等，可以分层级开关。
 
 #include <zephyr.h>
 #include <sys/printk.h>
+
 
 #ifdef CONFIG_MCUMGR_CMD_OS_MGMT
 #include <os_mgmt/os_mgmt.h>
@@ -58,8 +59,9 @@ void sysInit()
 
 void main(void)
 {
-    uint16_t adpd4100_id;
-    uint32_t ad5941_adiid, ad5941_id;
+ //   uint16_t adpd4100_id;
+    uint32_t  ad5941_adid, ad5941_adiiid;
+    uint32_t  ad5941_mingling = 0x00000002;
     double sht3x_temp = 0, sht3x_humi = 0;
 
     uint32_t count = 0U;
@@ -111,15 +113,23 @@ void main(void)
 		lv_task_handler();
 		++count;
 
-        ADPD4100_readRegister(ADPD4100_REG_CHIP_ID, &adpd4100_id);
-        LOG_INF("ADPD4100 Chip ID: 0x%.4x", adpd4100_id);
+       // ADPD4100_readRegister(ADPD4100_REG_CHIP_ID, &adpd4100_id);
+       // LOG_INF("ADPD4100 Chip ID: 0x%.4x", adpd4100_id);
 
-        AD5941_readRegister(AD5941_REG_ADIID, &ad5941_adiid, 1);
-        AD5941_readRegister(AD5941_REG_CHIPID, &ad5941_id, 1);
-        LOG_INF("AD5941   ADI ID:  0x%.4x, Chip ID: 0x%.4x", ad5941_adiid, ad5941_id);
 
-        SHT3X_singleShotMeasure(&sht3x_temp, &sht3x_humi);
-        LOG_INF("SHT3X Temperature: %.2f Cel, Humidity: %.2f %%RH", sht3x_temp, sht3x_humi);
+
+        AD5941_readRegister(0x2128, &ad5941_adid, 2);
+        LOG_INF("Before write:  0x%x", ad5941_adid);
+
+        AD5941_writeRegister(0x2128, &ad5941_mingling, 2);
+
+        AD5941_readRegister(0x2128, &ad5941_adiiid, 2);
+        LOG_INF("AFTER write:  0x%x", ad5941_adiiid);
+
+    //  SHT3X_singleShotMeasure(&sht3x_temp, &sht3x_humi);
+    //  LOG_INF("SHT3X Temperature: %.2f Cel, Humidity: %.2f %%RH", sht3x_temp, sht3x_humi);
+
+
 
         temperatureNotify(sht3x_temp);
         humidityNotify(sht3x_humi);
@@ -129,4 +139,5 @@ void main(void)
         dk_set_led_off(0);
         k_sleep(K_MSEC(500));
 	}
+
 }
